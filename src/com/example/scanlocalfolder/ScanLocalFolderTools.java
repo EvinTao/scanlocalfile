@@ -206,7 +206,7 @@ public class ScanLocalFolderTools {
         String path = ((String) item.get("path")).toLowerCase();
         if (path.endsWith(".txt")) {
 //            item.put("fileicon", R.drawable.icon_txtfile);
-        	item.put("fileicon", R.drawable.icon_txtfile);
+        	item.put("fileicon", R.drawable.icon_defaultfile);
         } else if (path.endsWith(".umd")) {
             item.put("fileicon", R.drawable.icon_umdfile);
         } else if (path.endsWith(".epub")) {
