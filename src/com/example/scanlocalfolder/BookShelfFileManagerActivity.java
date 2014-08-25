@@ -6,9 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.example.scanlocalfolder.ScanLocalFolderTools.IProgressListener;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -29,10 +32,12 @@ public class BookShelfFileManagerActivity extends Activity {
 
 	private boolean canusesdcard = true;
 	
+	private Handler mHandler = new Handler();
+	
 	private Button scanFile = null;
 	private TextView scanResultTv = null;
-	private final static String RESULT_STRING = "扫描结果: d%本";
-	private final static String SCANPROGRESS_STRING = "正在扫描 d%/d%";
+	private final static String RESULT_STRING = "扫描结果: %d本";
+	private final static String SCANPROGRESS_STRING = "正在扫描 %d//%d";
 	 private Set<String> mAlreadyMarksSet = new HashSet<String>();
 
 	@Override
@@ -40,12 +45,21 @@ public class BookShelfFileManagerActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.bookshelf_scan);
 		scanFile = (Button)findViewById(R.id.scanfile);
-		scanResultTv = (TextView)findViewById(R.id.scanresult_layout);
+		scanResultTv = (TextView)findViewById(R.id.scanresult_tv);
 		listView = (ListView)findViewById(R.id.scan_listview);
 		init();
 		listAdapter = new ShelfScanAdapter(this, listdata, mAlreadyMarksSet);
 		listView.setAdapter(listAdapter);
-		refresh();
+//		refresh();
+		
+		scanFile.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				searchType = 1;
+				refresh();
+			}
+		});
 	}
 
 	/**
@@ -92,9 +106,10 @@ public class BookShelfFileManagerActivity extends Activity {
                                 listAdapter.notifyDataSetChanged();
                                 listView.setSelection(0);
                             }
-                            changeTitleMode(searchType);
+                            setScanResult(listdata.size());
+//                            changeTitleMode(searchType);
                             try {
-                                dismissDialog();
+//                                dismissDialog();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -104,7 +119,7 @@ public class BookShelfFileManagerActivity extends Activity {
 
                     synchronized (listdataTemp) {
                         ScanLocalFolderTools.getAdapterList(rootpath, currentpath, needFileSuffix,
-                                searchType, listdataTemp, BookShelfFileManagerActivity.this);
+                                searchType, listdataTemp, BookShelfFileManagerActivity.this,mListener);
                     }
                     if (version == ScanLocalFolderTools.getNewVersion()) {
                         BookShelfFileManagerActivity.this.runOnUiThread(r1);
@@ -115,6 +130,29 @@ public class BookShelfFileManagerActivity extends Activity {
 		}
 		
 	}
+	
+	IProgressListener mListener = new IProgressListener() {
+		@Override
+		public void setProgress(final int size, final int total) {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					setScanProgress(size, total);
+				}
+			});
+		}
+
+		@Override
+		public void setFinish(final int result) {
+			// TODO Auto-generated method stub
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					setScanResult(result);
+				}
+			});
+		}
+	};
 	
 	/**
 	 * 扫描结果
@@ -133,6 +171,7 @@ public class BookShelfFileManagerActivity extends Activity {
 	public void setScanProgress(int progress, int total) {
 		String result = String.format(SCANPROGRESS_STRING, progress, total);
 		scanResultTv.setText(result);
+		listAdapter.notifyDataSetChanged();
 	}
 	
 	/**

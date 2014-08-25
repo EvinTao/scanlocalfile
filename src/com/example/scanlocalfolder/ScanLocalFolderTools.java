@@ -56,7 +56,7 @@ public class ScanLocalFolderTools {
      * @return
      */
     public static void getAdapterList(String rootpath, String path, String key, int type,
-            List<Map<String, Object>> listdata, Context context) {
+            List<Map<String, Object>> listdata, Context context,IProgressListener mListener) {
 
         if (path == null || rootpath == null || listdata == null) {
             Log.i(TAG, "path rootpath paths listdata have null ");
@@ -83,13 +83,13 @@ public class ScanLocalFolderTools {
 
             if (type <= 6) {
                 // 加载本地书签
-                addNeedFilesToList(rootpath, key, type, listdata);
+                addNeedFilesToList(rootpath, key, type, listdata,mListener);
             } else if (type == 7) {
                 // 加载本地书签
                 if(path.equals("/")){
-                    addNeedFilesToList(rootpath, key, type, listdata);
+                    addNeedFilesToList(rootpath, key, type, listdata,mListener);
                 }else{
-                    addNeedFilesToList(path, key, type, listdata);
+                    addNeedFilesToList(path, key, type, listdata,mListener);
                 }
                 Log.e("liyizhe", "rootpath:"+rootpath+",path"+path);
             }
@@ -142,6 +142,7 @@ public class ScanLocalFolderTools {
         // listdata.add(0, top);
         // }
         connectBookMarks(rootpath, path, type, listdata, context);
+        mListener.setFinish(listdata.size());
     }
 
     /** 关联书签到文件 */
@@ -204,7 +205,8 @@ public class ScanLocalFolderTools {
         item.put("size", size + "K");
         String path = ((String) item.get("path")).toLowerCase();
         if (path.endsWith(".txt")) {
-            item.put("fileicon", R.drawable.icon_txtfile);
+//            item.put("fileicon", R.drawable.icon_txtfile);
+        	item.put("fileicon", R.drawable.icon_txtfile);
         } else if (path.endsWith(".umd")) {
             item.put("fileicon", R.drawable.icon_umdfile);
         } else if (path.endsWith(".epub")) {
@@ -284,7 +286,7 @@ public class ScanLocalFolderTools {
      * @param listdata 对应数据；
      */
     private static void addNeedFilesToList(String path, String key, int type,
-            List<Map<String, Object>> listdata) {
+            List<Map<String, Object>> listdata,IProgressListener mListener) {
 
         if (path == null || "".equals(path)) {
             Log.e(TAG, "path is null or ''");
@@ -317,9 +319,12 @@ public class ScanLocalFolderTools {
                     item.put("type", FILE);
                     setFileInfo(item);
                     listdata.add(item);
+                    if(mListener != null){
+                    	mListener.setProgress(listdata.size(), listdata.size());
+                    }
                 }
             } else if (f.isDirectory()) {// 如果是文件夹
-                addNeedFilesToList(f.getPath(), key, type, listdata);
+                addNeedFilesToList(f.getPath(), key, type, listdata,mListener);
             }
         }
     }
@@ -386,6 +391,11 @@ public class ScanLocalFolderTools {
         }
 
         return re;
+    }
+    
+    public interface IProgressListener{
+    	public void setProgress(final int size,final int total);
+    	public void setFinish(final int result);
     }
 
 
