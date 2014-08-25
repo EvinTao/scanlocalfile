@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+     >
+    <RelativeLayout 
+        android:id="@+id/scanresult_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:background="#DEDEDE"
+        android:gravity="center_vertical"
+        android:padding="3dp">
+		<TextView  android:id="@+id/scanresult_tv"
+		    android:layout_width="wrap_content"
+		    android:layout_height="match_parent"
+		    android:textColor="#666666"
+		    android:textSize="12sp"
+		    android:text="扫描结果: 0本"
+		    android:layout_alignParentLeft="true"
+		    android:layout_marginLeft="5dp"
+		    android:gravity="center_vertical"/>
+        
+        <Button android:id="@+id/scanfile"
+            android:layout_width="40dp"
+            android:layout_height="match_parent" 
+            android:background="#0000ff"
+            android:text="扫描"
+            android:textColor="#FFFFFF"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="5dp"
+            />
+    </RelativeLayout>
+    
+     <ListView
+        android:id="@+id/scan_listview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/scanresult_layout"
+        android:cacheColorHint="#00000000"
+        android:divider="#26000000"
+        android:dividerHeight="0.5dp"
+        android:fadingEdgeLength="0dip"
+        android:fastScrollEnabled="true"
+        android:scrollbars="none"
+        android:listSelector="#00000000" />
+
+</RelativeLayout>
